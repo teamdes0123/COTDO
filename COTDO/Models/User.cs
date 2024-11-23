@@ -15,5 +15,7 @@ namespace COTDO.Models
         public int? TiempoEnServicio { get; set; }
         public string FechaIngreso { get; set; }
         public int? IdPeriodo { get; set; }
+        public string Correo {  get; set; }
+        public string Clave { get; set; }
     }
 }

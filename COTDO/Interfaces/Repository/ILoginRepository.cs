@@ -1,4 +1,5 @@
 ﻿using COTDO.Models;
+using COTDO.Models.ViewModels.Login;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,5 +12,6 @@ namespace COTDO.Interfaces.Repository
     {
         Task<bool> IsValidUser(string cedula);
         Task<User> GetUserByCedula(string cedula);
+        Task<bool> CreateUser(RegisterVM vm);
     }
 }

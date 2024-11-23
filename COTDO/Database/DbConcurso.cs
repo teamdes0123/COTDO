@@ -8,11 +8,11 @@ namespace COTDO.Database
 {
     public class DbConcurso
     {
-        public string ConnectionString { get; }
+        public string ConnectionString { get; } = string.Empty;
 
         public DbConcurso()
         {
-            ConnectionString = ConfigurationManager.ConnectionStrings["dbConcursoFocalizado2023BKL"].ConnectionString;
+            ConnectionString = ConfigurationManager.ConnectionStrings["dbConcurso"].ConnectionString;
         }
     }
 }

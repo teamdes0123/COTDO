@@ -1,6 +1,8 @@
 ﻿using COTDO.Database;
+using COTDO.Helpers;
 using COTDO.Interfaces.Repository;
 using COTDO.Models;
+using COTDO.Models.ViewModels.Login;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -11,13 +13,15 @@ using System.Web;
 
 namespace COTDO.Repository.Login
 {
-    public class LoginRepository : ILoginRepository
+    public class LoginRepository
     {
         private readonly DbConcurso _dbConcurso;
+        private readonly PasswordHelper _passwordHelper;
 
         public LoginRepository()
         {
             _dbConcurso = new DbConcurso();
+            _passwordHelper = new PasswordHelper();
         }
 
         public async Task<bool> IsValidUser(string cedula)
@@ -47,7 +51,7 @@ namespace COTDO.Repository.Login
 
         public async Task<User> GetUserByCedula(string cedula)
         {
-            var user = new User();
+            User user = null;
 
             using (var con = new SqlConnection(_dbConcurso.ConnectionString))
             {
@@ -85,6 +89,40 @@ namespace COTDO.Repository.Login
             }
 
             return user;
+        }
+
+        public async Task<bool> CreateUser(RegisterVM user, int? codCargo)
+        {
+            using (var con = new SqlConnection(_dbConcurso.ConnectionString))
+            {
+                try
+                {
+                    using (var sc = new SqlCommand("[dbo].[prc_Inserta_CandidatoTecnico]", con))
+                    {
+                        sc.CommandType = CommandType.StoredProcedure;
+                        sc.Parameters.Add("Cedula", SqlDbType.Char, 13).Value = user.Cedula;
+                        sc.Parameters.Add("CodCargo", SqlDbType.Int).Value = codCargo;
+                        sc.Parameters.Add("Correo", SqlDbType.VarChar, 100).Value = user.Correo;
+                        sc.Parameters.Add("Clave", SqlDbType.VarChar, 200).Value = _passwordHelper.HashPassword(user.Clave);
+
+                        await con.OpenAsync();
+                        int rowsAffected = await sc.ExecuteNonQueryAsync();
+
+                        if (rowsAffected > 0)
+                        {
+                            return true;
+                        }
+                        else 
+                        { 
+                            return false;
+                        }
+                    }
+                }
+                catch (Exception)
+                {
+                    return false;
+                }
+            }
         }
     }
 }

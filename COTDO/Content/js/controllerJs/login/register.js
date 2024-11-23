@@ -32,7 +32,8 @@ function validateForm(e) {
         return;
     }
 
-    createAccount(inputs);
+    $('#btnRegistrar').prop('disabled', true);
+    createAccount(inputs, e.target);
 }
 
 function validatePasswords(pass1, pass2) {
@@ -50,7 +51,7 @@ function validateDomains(email) {
     return domains.some(validDomain => validDomain === domain);
 }
 
-function createAccount(obj) {
+function createAccount(obj, target) {
     fetch(`${controller}/Register`, {
         method: 'POST',
         headers: {
@@ -60,17 +61,30 @@ function createAccount(obj) {
     })
         .then(response => {
             if (!response.ok) {
-                showAlert(e.target, "Ocurrió un error al registrar la cuenta. Inténtelo más tarde.", "warning");
+                showAlert(target, "Ocurrió un error al registrar la cuenta. Inténtelo más tarde.", "warning");
+                $('#btnRegistrar').prop('disabled', false);
                 return;
             }
 
             return response.json();
         })
         .then(result => {
-            console.log(result);
+            const { IsSuccess, Message } = result._response;
+
+            if (!IsSuccess) {
+                showAlert(target, Message, "warning");
+                $('#btnRegistrar').prop('disabled', false);
+                return;
+            }
+
+            showAlert(target, Message, "success");
+            setTimeout(() => {
+                window.location.href = `${controller}/Index`;
+            }, 5000);
         })
         .catch(error => {
             console.error(`Error: ${error}`);
-            showAlert(e.target, "Ocurrió un error al registrar la cuenta. Inténtelo más tarde.", "warning");
+            showAlert(target, "Ocurrió un error al registrar la cuenta. Inténtelo más tarde.", "warning");
+            $('#btnRegistrar').prop('disabled', false);
         });
 }

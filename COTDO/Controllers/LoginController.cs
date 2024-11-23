@@ -1,4 +1,5 @@
 ﻿using COTDO.Interfaces.Repository;
+using COTDO.Models;
 using COTDO.Models.ViewModels.Login;
 using COTDO.Repository.Login;
 using System;
@@ -12,7 +13,8 @@ namespace COTDO.Controllers
 {  
     public class LoginController : Controller
     {
-        private readonly ILoginRepository _loginRepository;
+        private readonly LoginRepository _loginRepository = new LoginRepository();
+        private readonly Response _response = new Response();
 
         public ActionResult Index()
         {
@@ -31,14 +33,44 @@ namespace COTDO.Controllers
         }
 
         [HttpPost]
-        public ActionResult Register(RegisterVM vm) 
+        public async Task<ActionResult> Register(RegisterVM vm) 
         {
             if (!ModelState.IsValid)
             {
-                return Json(new { success = false });
+                _response.IsSuccess = false;
+                _response.Message = "Debe completar todos los campos del formulario.";
+                return Json(new { _response });
             }
 
-            return Json(new { success = true });
+            var user = await _loginRepository.GetUserByCedula(vm.Cedula);
+
+            if (user == null) {
+                _response.IsSuccess = false;
+                _response.Message = "Usted no es elegible para este proceso de concurso.";
+                return Json(new { _response });
+            }
+            else
+            {
+                if (user.TiempoEnServicio < 5)
+                {
+                    _response.IsSuccess = false;
+                    _response.Message = "Usted no cumple con el tiempo de servicio requerido para participar en este proceso de concurso.";
+                    return Json(new { _response });
+                }
+
+                _response.IsSuccess = await _loginRepository.CreateUser(vm, user.CodCargo);
+
+                if (_response.IsSuccess)
+                {
+                    _response.Message = "Su cuenta ha sido creada exitosamente. Será redirigido a la ventana de inicio de sesión.";
+                    return Json(new { _response });
+                }
+                else
+                {
+                    _response.Message = "No se pudo crear su cuenta en este momento. Por favor, intente nuevamente más tarde.";
+                    return Json(new { _response });
+                }
+            }
         }
     }
 }
