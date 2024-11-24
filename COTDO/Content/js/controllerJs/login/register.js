@@ -52,6 +52,7 @@ function validateDomains(email) {
 }
 
 function createAccount(obj, target) {
+    showLoader();
     fetch(`${controller}/Register`, {
         method: 'POST',
         headers: {
@@ -61,6 +62,7 @@ function createAccount(obj, target) {
     })
         .then(response => {
             if (!response.ok) {
+                Swal.close();
                 showAlert(target, "Ocurrió un error al registrar la cuenta. Inténtelo más tarde.", "error");
                 $('#btnRegistrar').prop('disabled', false);
                 return;
@@ -72,6 +74,7 @@ function createAccount(obj, target) {
             const { IsSuccess, Message } = result._response;
 
             if (!IsSuccess) {
+                Swal.close();
                 showAlert(target, Message, "warning");
                 $('#btnRegistrar').prop('disabled', false);
                 return;
@@ -80,9 +83,11 @@ function createAccount(obj, target) {
             showAlert(target, Message, "success");
             setTimeout(() => {
                 window.location.href = `${controller}/Index`;
+                Swal.close();
             }, 5000);
         })
         .catch(error => {
+            Swal.close();
             console.error(`Error: ${error}`);
             showAlert(target, "Ocurrió un error al registrar la cuenta. Inténtelo más tarde.", "error");
             $('#btnRegistrar').prop('disabled', false);

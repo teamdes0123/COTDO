@@ -56,6 +56,7 @@ function logIn(obj) {
             $('#btnLogin').prop('disabled', false);
             setTimeout(() => {
                 window.location.replace(`${controllerHome}/Index`);
+                Swal.close();
             }, 200)
         })
         .catch(error => {

@@ -25,36 +25,47 @@ namespace COTDO.Services.Login
 
         public async Task<Response> CreateAccount(RegisterVM vm)
         {
-            var user = await _loginRepository.GetUserByCedula(vm.Cedula);
+            bool IsExists = await _loginRepository.IsExistsAccount(vm.Correo);
 
-            if (user == null)
+            if (IsExists)
             {
                 _response.IsSuccess = false;
-                _response.Message = "Usted no es elegible para este proceso de concurso.";
+                _response.Message = "El correo ingresado ya está asociado a una cuenta existente. Por favor, utilice un correo diferente para registrarse.";
                 return _response;
             }
             else
             {
-                if (user.TiempoEnServicio < 5)
+                var user = await _loginRepository.GetUserByCedula(vm.Cedula);
+
+                if (user == null)
                 {
                     _response.IsSuccess = false;
-                    _response.Message = "Usted no cumple con el tiempo de servicio requerido para participar en este proceso de concurso.";
-                    return _response;
-                }
-
-                _response.IsSuccess = await _loginRepository.CreateUser(vm, user.CodCargo);
-
-                if (_response.IsSuccess)
-                {
-                    _response.Message = "Su cuenta ha sido creada exitosamente. Será redirigido a la ventana de inicio de sesión.";
+                    _response.Message = "Usted no es elegible para este proceso de concurso.";
                     return _response;
                 }
                 else
                 {
-                    _response.Message = "No se pudo crear su cuenta en este momento. Por favor, intente nuevamente más tarde.";
-                    return _response;
+                    if (user.TiempoEnServicio < 5)
+                    {
+                        _response.IsSuccess = false;
+                        _response.Message = "Usted no cumple con el tiempo de servicio requerido para participar en este proceso de concurso.";
+                        return _response;
+                    }
+
+                    _response.IsSuccess = await _loginRepository.CreateUser(vm, user.CodCargo);
+
+                    if (_response.IsSuccess)
+                    {
+                        _response.Message = "Su cuenta ha sido creada exitosamente. Será redirigido a la ventana de inicio de sesión.";
+                        return _response;
+                    }
+                    else
+                    {
+                        _response.Message = "No se pudo crear su cuenta en este momento. Por favor, intente nuevamente más tarde.";
+                        return _response;
+                    }
                 }
-            }
+            }          
         }
 
         public async Task<Response> LogIn(LoginVM vm)
