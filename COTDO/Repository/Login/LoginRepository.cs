@@ -124,5 +124,76 @@ namespace COTDO.Repository.Login
                 }
             }
         }
+
+        public async Task<bool> IsExistsAccount(string correo)
+        {
+            using (var con = new SqlConnection(_dbConcurso.ConnectionString))
+            {
+                try
+                {
+                    using (var sc = new SqlCommand("dbo.prc_Valida_CandidatoTecnicoPorCorreo", con))
+                    {
+                        sc.CommandType = CommandType.StoredProcedure;
+                        sc.Parameters.Add("Correo", SqlDbType.VarChar, 100).Value = correo;
+
+                        await con.OpenAsync();
+                        using (var reader = await sc.ExecuteReaderAsync())
+                        {
+                            return reader.HasRows;
+                        }
+                    }
+                }
+                catch (Exception)
+                {
+                    return false;
+                }
+            }
+        }
+
+        public async Task<User> GetCandidate(LoginVM vm)
+        {
+            User user = null;
+
+            using (var con = new SqlConnection(_dbConcurso.ConnectionString))
+            {
+                try
+                {
+                    using (var sc = new SqlCommand("dbo.prc_Obtiene_CandidatoTecnico", con))
+                    {
+                        sc.CommandType = CommandType.StoredProcedure;
+                        sc.Parameters.Add("Correo", SqlDbType.VarChar, 100).Value = vm.Username;
+
+                        await con.OpenAsync();
+                        using (var reader = await sc.ExecuteReaderAsync())
+                        {
+                            while (await reader.ReadAsync())
+                            {
+                                string storedHash = reader.GetString(reader.GetOrdinal("Hash"));
+
+                                if (_passwordHelper.VerifyPassword(vm.Password, storedHash))
+                                {
+                                    user = new User
+                                    {
+                                        Cedula = reader.IsDBNull(reader.GetOrdinal("Cedula")) ? "" : reader.GetString(reader.GetOrdinal("Cedula")),
+                                        Nombres = reader.IsDBNull(reader.GetOrdinal("Nombres")) ? "" : reader.GetString(reader.GetOrdinal("Nombres")),
+                                        Apellido1 = reader.IsDBNull(reader.GetOrdinal("Apellido1")) ? "" : reader.GetString(reader.GetOrdinal("Apellido1")),
+                                        Apellido2 = reader.IsDBNull(reader.GetOrdinal("Apellido2")) ? "" : reader.GetString(reader.GetOrdinal("Apellido2")),
+                                        CodCargo = reader.IsDBNull(reader.GetOrdinal("CodCargo")) ? (int?)null : reader.GetInt32(reader.GetOrdinal("CodCargo")),
+                                        TiempoEnServicio = reader.IsDBNull(reader.GetOrdinal("TiempoServicio")) ? (int?)null : reader.GetInt32(reader.GetOrdinal("TiempoServicio"))
+                                    };
+
+                                }                              
+                            }
+                        }
+                    }
+                }
+                catch (Exception)
+                {
+                    return null;
+                }
+            }
+
+            return user;
+        }
     }
 }

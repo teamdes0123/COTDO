@@ -1,4 +1,4 @@
-﻿function showAlert(targetElement, msj, type) {
+﻿function showAlert(element, msj, type) {
     const existingAlert = document.querySelector('.alertMessage');
 
     if (existingAlert) {
@@ -6,7 +6,7 @@
     }
 
     const newAlert = document.createElement('div');
-    newAlert.className = 'alert d-flex justify-content-center align-items-center alertMessage my-3 text-center fw-bold';
+    newAlert.className = 'alert d-flex justify-content-center align-items-center alertMessage my-3 text-center fw-bold animate__animated animate__fadeIn animate__faster';
     if (type === 'error') {
         newAlert.classList.add('alert-danger');
         newAlert.innerHTML = `
@@ -34,9 +34,98 @@
     message.textContent = msj;
     newAlert.appendChild(message);
 
-    targetElement.appendChild(newAlert);
+    element.appendChild(newAlert);
 
     setTimeout(() => {
-        newAlert.remove();
-    }, 4000);
+        newAlert.classList.add('animate__fadeOut');
+        setTimeout(() => {
+            newAlert.remove();
+        }, 300)
+    }, 5000);
+}
+
+function showLoader() {
+    Swal.fire({
+        title: "Cargando...",
+        didOpen: () => {
+            Swal.showLoading();
+        },
+        showClass: {
+            popup: `
+                animate__animated
+                animate__zoomIn
+                animate__faster
+            `
+        },
+        hideClass: {
+            popup: `
+                animate__animated
+                animate__zoomOut
+                animate__faster
+            `
+        },
+        allowOutsideClick: false
+    });
+}
+
+function showLoaderCustom(title, msj) {
+    Swal.fire({
+        title: title,
+        html: msj,
+        didOpen: () => {
+            Swal.showLoading();
+        },
+        showClass: {
+            popup: `
+                animate__animated
+                animate__zoomIn
+                animate__faster
+            `
+        },
+        hideClass: {
+            popup: `
+                animate__animated
+                animate__zoomOut
+                animate__faster
+            `
+        }
+    });
+}
+
+function showSpinner(parentElement) {
+    const spinnerExists = document.querySelector('.sk-circle');
+
+    if (spinnerExists) {
+        spinnerExists.remove();
+    }
+
+    const spinner = document.createElement('div');
+    spinner.className = `sk-fading-circle`;
+
+    spinner.innerHTML = `
+      <div class="sk-circle1 sk-child"></div>
+      <div class="sk-circle2 sk-child"></div>
+      <div class="sk-circle3 sk-child"></div>
+      <div class="sk-circle4 sk-child"></div>
+      <div class="sk-circle5 sk-child"></div>
+      <div class="sk-circle6 sk-child"></div>
+      <div class="sk-circle7 sk-child"></div>
+      <div class="sk-circle8 sk-child"></div>
+      <div class="sk-circle9 sk-child"></div>
+      <div class="sk-circle10 sk-child"></div>
+      <div class="sk-circle11 sk-child"></div>
+      <div class="sk-circle12 sk-child"></div>
+    `;
+
+    parentElement.appendChild(spinner);
+}
+
+function hideSpinner() {
+    const spinnerExists = document.querySelector('.sk-circle');
+
+    if (spinnerExists) {
+        setTimeout(() => {
+            spinnerExists.remove();
+        }, 300)
+    }
 }

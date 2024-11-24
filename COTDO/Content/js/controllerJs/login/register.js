@@ -12,8 +12,8 @@ function validateForm(e) {
     e.preventDefault();
 
     const inputs = {
-        cedula: $('#txtCedula').val(),
-        correo: $('#txtCorreo').val(),
+        cedula: $('#txtCedula').val().trim().toLowerCase(),
+        correo: $('#txtCorreo').val().trim().toLowerCase(),
         clave: $('#txtPassword').val()
     };
 
@@ -61,7 +61,7 @@ function createAccount(obj, target) {
     })
         .then(response => {
             if (!response.ok) {
-                showAlert(target, "Ocurrió un error al registrar la cuenta. Inténtelo más tarde.", "warning");
+                showAlert(target, "Ocurrió un error al registrar la cuenta. Inténtelo más tarde.", "error");
                 $('#btnRegistrar').prop('disabled', false);
                 return;
             }
@@ -84,7 +84,7 @@ function createAccount(obj, target) {
         })
         .catch(error => {
             console.error(`Error: ${error}`);
-            showAlert(target, "Ocurrió un error al registrar la cuenta. Inténtelo más tarde.", "warning");
+            showAlert(target, "Ocurrió un error al registrar la cuenta. Inténtelo más tarde.", "error");
             $('#btnRegistrar').prop('disabled', false);
         });
 }

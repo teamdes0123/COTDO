@@ -148,8 +148,10 @@
     <Compile Include="Models\ViewModels\Login\RegisterVM.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Repository\Login\LoginRepository.cs" />
+    <Compile Include="Services\Login\LoginService.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Content\animate.min.css" />
     <Content Include="Content\bootstrap-grid.css" />
     <Content Include="Content\bootstrap-grid.min.css" />
     <Content Include="Content\bootstrap-grid.rtl.css" />
@@ -170,8 +172,11 @@
     <Content Include="Content\js\controllerJs\login\register.js" />
     <Content Include="Content\js\helpers\common.js" />
     <Content Include="Content\js\jquery.mask.min.js" />
+    <Content Include="Content\js\sweetalert2%4011.js" />
     <Content Include="Content\Plantilla\css\sb-admin-2.css" />
     <Content Include="Content\Plantilla\css\sb-admin-2.min.css" />
+    <Content Include="Content\Plantilla\img\login_concursos_VA.jpg" />
+    <Content Include="Content\Plantilla\img\logocenter.png" />
     <Content Include="Content\Plantilla\img\user.svg" />
     <Content Include="Content\Plantilla\js\demo\chart-area-demo.js" />
     <Content Include="Content\Plantilla\js\demo\chart-bar-demo.js" />
@@ -1848,6 +1853,7 @@
     <Content Include="Content\Plantilla\vendor\jquery\jquery.min.js" />
     <Content Include="Content\Plantilla\vendor\jquery\jquery.slim.js" />
     <Content Include="Content\Plantilla\vendor\jquery\jquery.slim.min.js" />
+    <Content Include="Content\spinner.css" />
     <Content Include="favicon.ico" />
     <Content Include="Global.asax" />
     <Content Include="Content\Site.css" />
