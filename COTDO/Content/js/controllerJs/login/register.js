@@ -40,17 +40,6 @@ function validatePasswords(pass1, pass2) {
     return pass1 === pass2;
 }
 
-function validateDomains(email) {
-    const domains = [
-        "gmail.com",
-        "hotmail.com"
-    ];
-
-    const domain = email.split("@")[1];
-
-    return domains.some(validDomain => validDomain === domain);
-}
-
 function createAccount(obj, target) {
     showLoader();
     fetch(`${controller}/Register`, {
@@ -81,10 +70,10 @@ function createAccount(obj, target) {
             }
 
             showAlert(target, Message, "success");
+            Swal.close();
             setTimeout(() => {
                 window.location.href = `${controller}/Index`;
-                Swal.close();
-            }, 5000);
+            }, 2400);
         })
         .catch(error => {
             Swal.close();

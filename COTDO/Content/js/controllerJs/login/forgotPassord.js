@@ -1,9 +1,10 @@
-﻿const form = $('.formLogin');
+﻿const form = $('.formForgotPass');
 
 $(document).ready(() => {
     $('#txtCedula').mask('000-0000000-0', {
         reverse: true
     });
+
     form.on('submit', validateForm);
 });
 
@@ -11,24 +12,30 @@ function validateForm(e) {
     e.preventDefault();
 
     const inputs = {
-        username: $('#txtCedula').val().trim().toLowerCase(),
-        password: $('#txtPassword').val().trim()
+        cedula: $('#txtCedula').val().trim().toLowerCase(),
+        correo: $('#txtCorreo').val().trim().toLowerCase(),
     }
 
-    if (Object.values(inputs).some(inputValue => !inputValue.trim())) {
-        showAlert(e.target, 'Por favor, ingrese tanto el usuario como la contraseña para iniciar sesión.', 'warning');
+    if (Object.values(inputs).some(value => !value.trim())) {
+        showAlert(e.target, "Debe completar todos los campos del formulario", "warning");
         return;
     }
 
-    $('#btnLogin').prop('disabled', true);
-    logIn(inputs);
-}
 
+    if (!validateDomains(inputs.correo)) {
+        showAlert(e.target, "El dominio del correo no está permitido", "warning");
+        return;
+    }
+
+    $('#btnRecuperar').prop('disabled', true);
+    recuperarContraseña(inputs);
+
+}
 function logIn(obj) {
-    const element = document.querySelector('.formLogin');
+    const element = document.querySelector('.formForgotPass');
     showLoader();
 
-    fetch(`${controller}/Login`, {
+    fetch(`${controller}/RecuperarContraseña`, {
         method: 'POST',
         headers: {
             'content-type': 'application/json'
@@ -39,7 +46,7 @@ function logIn(obj) {
             if (!response.ok) {
                 Swal.close();
                 showAlert(element, "Ocurrió un error al intentar iniciar sesión. Inténtelo más tarde.", "error");
-                $('#btnLogin').prop('disabled', false);
+                $('#btnRecuperar').prop('disabled', false);
                 return;
             }
 
@@ -51,12 +58,12 @@ function logIn(obj) {
             if (!IsSuccess) {
                 Swal.close();
                 showAlert(element, Message, "warning");
-                $('#btnLogin').prop('disabled', false);
+                $('#btnRecuperar').prop('disabled', false);
                 return;
             }
 
             Swal.close();
-            $('#btnLogin').prop('disabled', false);
+            $('#btnRecuperar').prop('disabled', false);
             setTimeout(() => {
                 window.location.replace(`${controllerHome}/Index`);
                 Swal.close();
@@ -65,7 +72,7 @@ function logIn(obj) {
         .catch(error => {
             Swal.close();
             showAlert(element, "Ocurrió un error al intentar iniciar sesión. Inténtelo más tarde.", "error");
-            $('#btnLogin').prop('disabled', false);
+            $('#btnRecuperar').prop('disabled', false);
             console.error(`Error: ${error}`);
         });
 }

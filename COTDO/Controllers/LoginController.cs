@@ -110,5 +110,10 @@ namespace COTDO.Controllers
 
             return Json(new { _response = response });
         }
+
+        public ActionResult ForgotPassword()
+        {
+            return View();
+        }
     }
 }

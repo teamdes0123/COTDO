@@ -49,6 +49,31 @@ namespace COTDO.Repository.Login
             }
         }
 
+        public async Task<bool> IsValidCedula(string cedula)
+        {
+            using (var con = new SqlConnection(_dbConcurso.ConnectionString))
+            {
+                try
+                {
+                    using (var sc = new SqlCommand("[dbo].[prc_Valida_CandidatoTecnico]", con))
+                    {
+                        sc.CommandType = CommandType.StoredProcedure;
+                        sc.Parameters.Add("Cedula", SqlDbType.Char, 13).Value = cedula;
+
+                        await con.OpenAsync();
+                        using (var reader = await sc.ExecuteReaderAsync())
+                        {
+                            return reader.HasRows;
+                        }
+                    }
+                }
+                catch (Exception)
+                {
+                    return false;
+                }
+            }
+        }
+
         public async Task<User> GetUserByCedula(string cedula)
         {
             User user = null;
@@ -161,7 +186,7 @@ namespace COTDO.Repository.Login
                     using (var sc = new SqlCommand("dbo.prc_Obtiene_CandidatoTecnico", con))
                     {
                         sc.CommandType = CommandType.StoredProcedure;
-                        sc.Parameters.Add("Correo", SqlDbType.VarChar, 100).Value = vm.Username;
+                        sc.Parameters.Add("Cedula", SqlDbType.VarChar, 100).Value = vm.Username;
 
                         await con.OpenAsync();
                         using (var reader = await sc.ExecuteReaderAsync())

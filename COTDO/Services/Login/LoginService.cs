@@ -33,44 +33,50 @@ namespace COTDO.Services.Login
                 _response.Message = "El correo ingresado ya está asociado a una cuenta existente. Por favor, utilice un correo diferente para registrarse.";
                 return _response;
             }
+
+            bool IsExistsCedula = await _loginRepository.IsValidCedula(vm.Cedula);
+
+            if (IsExistsCedula)
+            {
+                _response.IsSuccess = false;
+                _response.Message = "La cédula ingresada ya se encuentra registrada";
+                return _response;
+            }
+
+            var user = await _loginRepository.GetUserByCedula(vm.Cedula);
+
+            if (user == null)
+            {
+                _response.IsSuccess = false;
+                _response.Message = "Usted no es elegible para este proceso de concurso.";
+                return _response;
+            }
+
+            if (user.TiempoEnServicio < 5)
+            {
+                _response.IsSuccess = false;
+                _response.Message = "Usted no cumple con el tiempo de servicio requerido para participar en este proceso de concurso.";
+                return _response;
+            }
+
+            _response.IsSuccess = await _loginRepository.CreateUser(vm, user.CodCargo);
+
+            if (_response.IsSuccess)
+            {
+                _response.Message = "Su cuenta ha sido creada exitosamente. Será redirigido a la ventana de inicio de sesión.";
+                return _response;
+            }
             else
             {
-                var user = await _loginRepository.GetUserByCedula(vm.Cedula);
-
-                if (user == null)
-                {
-                    _response.IsSuccess = false;
-                    _response.Message = "Usted no es elegible para este proceso de concurso.";
-                    return _response;
-                }
-                else
-                {
-                    if (user.TiempoEnServicio < 5)
-                    {
-                        _response.IsSuccess = false;
-                        _response.Message = "Usted no cumple con el tiempo de servicio requerido para participar en este proceso de concurso.";
-                        return _response;
-                    }
-
-                    _response.IsSuccess = await _loginRepository.CreateUser(vm, user.CodCargo);
-
-                    if (_response.IsSuccess)
-                    {
-                        _response.Message = "Su cuenta ha sido creada exitosamente. Será redirigido a la ventana de inicio de sesión.";
-                        return _response;
-                    }
-                    else
-                    {
-                        _response.Message = "No se pudo crear su cuenta en este momento. Por favor, intente nuevamente más tarde.";
-                        return _response;
-                    }
-                }
-            }          
+                _response.Message = "No se pudo crear su cuenta en este momento. Por favor, intente nuevamente más tarde.";
+                return _response;
+            }
         }
+
 
         public async Task<Response> LogIn(LoginVM vm)
         {
-            if (!await _loginRepository.IsExistsAccount(vm.Username))
+            if (!await _loginRepository.IsValidCedula(vm.Username))
             {
                 _response.IsSuccess = false;
                 _response.Message = "No se encontró ninguna cuenta registrada con este correo.";
@@ -93,7 +99,7 @@ namespace COTDO.Services.Login
                     _response.Data = user;
                     return _response;
                 }
-            }         
+            }
         }
     }
 }

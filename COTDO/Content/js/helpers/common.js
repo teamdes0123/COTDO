@@ -91,3 +91,14 @@ function showLoaderCustom(title, msj) {
         }
     });
 }
+
+function validateDomains(email) {
+    const domains = [
+        "gmail.com",
+        "hotmail.com"
+    ];
+
+    const domain = email.split("@")[1];
+
+    return domains.some(validDomain => validDomain === domain);
+}
